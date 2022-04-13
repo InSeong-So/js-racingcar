@@ -1,4 +1,17 @@
+import { useStore, pipeline } from '../../helpers/index.js';
+
+const store = useStore();
+
 export default class ComponentHandler extends HTMLElement {
+  constructor() {
+    super();
+    this.store = store;
+  }
+
+  process(execute, params) {
+    return pipeline(execute, params);
+  }
+
   bindHandler(events) {
     events.forEach(({ type, callback }) => this.addEventListener(type, callback));
     return () => {

@@ -1,7 +1,6 @@
-import ComponentHandler from '../ComponentHandler.js';
-import { CONTROLL_KEY } from '../constants.js';
-import { pipeline } from '../factory/index.js';
-import { $element } from '../helpers/index.js';
+import ComponentHandler from './abstract/index.js';
+import { renderResetArea } from '../services.js';
+import * as Helpers from '../helpers/index.js';
 
 const template = /*html*/ `
 <section class="d-flex justify-center mt-5 hidden" name="result-section">
@@ -18,11 +17,18 @@ export default class ResultSection extends ComponentHandler {
 
   constructor() {
     super();
-    this.insertAdjacentElement('afterbegin', $element(template));
+    this.insertAdjacentElement('afterbegin', Helpers.$element(template));
   }
 
   finishGame() {
-    pipeline(CONTROLL_KEY.RESULT, this.getAttribute('winners'));
+    // prettier-ignore
+    this.process(
+      Helpers.pipe(
+        Helpers.trimComma,
+        renderResetArea,
+      ),
+      this.getAttribute('winners'),
+    );
   }
 
   gameReset = event => {

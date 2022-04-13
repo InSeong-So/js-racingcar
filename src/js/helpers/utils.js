@@ -3,6 +3,15 @@ import { DICE_RANGE, ERROR_MESSAGE } from '../constants.js';
 // prettier-ignore
 export const pipe = (...fns) => value => fns.reduce((_value, fn) => fn(_value), value);
 
+export const pipeline = (execute, params) => {
+  try {
+    return execute(params);
+  } catch (error) {
+    alert(error.message);
+    return null;
+  }
+};
+
 export const trim = value => {
   if (typeof value !== 'string') throw new ReferenceError(ERROR_MESSAGE.INVALID_TYPE);
 

@@ -1,7 +1,7 @@
-import ComponentHandler from '../ComponentHandler.js';
-import { CONTROLL_KEY, MAX_GAME_TRY_COUNT } from '../constants.js';
-import { pipeline } from '../factory/index.js';
-import { isNull, $element, $focus } from '../helpers/index.js';
+import ComponentHandler from './abstract/index.js';
+import { MAX_GAME_TRY_COUNT } from '../constants.js';
+import { checkValidations } from '../services.js';
+import * as Helpers from '../helpers/index.js';
 
 const template = /*html*/ `
 <section class="d-flex justify-center mt-5">
@@ -33,22 +33,37 @@ export default class InputSection extends ComponentHandler {
 
   constructor() {
     super();
-    this.insertAdjacentElement('afterbegin', $element(template));
+    this.insertAdjacentElement('afterbegin', Helpers.$element(template));
   }
 
   checkInputCarNames = event => {
     if (!event.target.matches('#car-names-form')) return;
     event.preventDefault();
 
-    const parsedCarNames = pipeline(
-      CONTROLL_KEY.CAR_NAMES,
+    // prettier-ignore
+    const parsedCarNames = this.process(
+      Helpers.pipe(
+        Helpers.trim,
+        Helpers.trimComma,
+        Helpers.split,
+        Helpers.removeSpace,
+        checkValidations,
+      ),
       event.target.elements['car-names'].value,
     );
 
-    if (isNull(parsedCarNames)) return;
+    if (Helpers.isNull(parsedCarNames)) return;
 
+    // prettier-ignore
     this.#carNames = parsedCarNames;
-    pipeline(CONTROLL_KEY.CAR_NAMES_AFTER);
+    this.process(
+      Helpers.pipe(
+        () => Helpers.$show('#game-try-count-form'),
+        () => Helpers.$disabled('#car-names'),
+        () => Helpers.$disabled('#car-names-confirm'),
+        () => setTimeout(() => Helpers.$focus('#game-try-count'), 100),
+      ),
+    );
   };
 
   checkInputTryCount = event => {
@@ -60,7 +75,13 @@ export default class InputSection extends ComponentHandler {
       tryCount: event.target.elements['game-try-count'].valueAsNumber,
     });
 
-    pipeline(CONTROLL_KEY.TRY_COUNT_AFTER);
+    // prettier-ignore
+    this.process(
+      Helpers.pipe(
+        () => Helpers.$disabled('#game-try-count'),
+        () => Helpers.$disabled('#game-try-count-confirm'),
+      ),
+    );
   };
 
   connectedCallback() {
@@ -75,7 +96,7 @@ export default class InputSection extends ComponentHandler {
       },
     ]);
 
-    $focus('#car-names');
+    Helpers.$focus('#car-names');
   }
 
   disconnectedCallback() {

@@ -1,9 +1,4 @@
-import {
-  ERROR_MESSAGE,
-  MAX_NAME_DIGITS,
-  MOVE_CONDITION,
-  RESULT_ALERT_DELAY,
-} from '../constants.js';
+import { ERROR_MESSAGE, MAX_NAME_DIGITS, MOVE_CONDITION, RESULT_ALERT_DELAY } from './constants.js';
 import {
   pipe,
   isDuplicatedArray,
@@ -13,10 +8,7 @@ import {
   $element,
   $setAttributes,
   $show,
-} from '../helpers/index.js';
-import useStore from './store.js';
-
-const store = useStore();
+} from './helpers/index.js';
 
 const renderWinners = ({ winners }) => {
   const attributes = [['winners', winners]];
@@ -24,7 +16,7 @@ const renderWinners = ({ winners }) => {
   $setAttributes('result-section', attributes);
 };
 
-const parsedRacingGameWinner = cars => {
+const parsedRacingGameWinner = ({ store, cars }) => {
   const maxMoveCount = store.getState('maxMoveCount');
   const winners = cars.reduce(
     (result, { name, moveCount }) => (maxMoveCount === moveCount ? `${result}, ${name}` : result),
@@ -34,13 +26,13 @@ const parsedRacingGameWinner = cars => {
   return { cars, winners };
 };
 
-const removeCarSpinner = ({ cars }) => {
+const removeCarSpinner = ({ store, cars }) => {
   cars.forEach(({ name }) => {
     const $car = document.getElementById(name);
     $car.lastElementChild.remove();
   });
 
-  return cars;
+  return { store, cars };
 };
 
 const renderCarMoveForward = selector => {
@@ -49,7 +41,7 @@ const renderCarMoveForward = selector => {
   $car.insertBefore($moveArrow, $car.lastElementChild);
 };
 
-const racing = ({ cars }) => {
+const racing = ({ store, cars }) => {
   const dice = generateRandomNumbers({ count: cars.length });
 
   cars.forEach((car, index) => {
@@ -74,13 +66,13 @@ export const checkValidations = carNames => {
   return checkedLength;
 };
 
-export const racingWrapper = ({ tryCount, cars }) => {
+export const racingWrapper = ({ store, cars, tryCount }) => {
   store.initStore();
 
   return delayLoop({
     limit: tryCount,
     func: racing,
-    params: { cars },
+    params: { store, cars },
     callback: pipe(removeCarSpinner, parsedRacingGameWinner, renderWinners),
   });
 };

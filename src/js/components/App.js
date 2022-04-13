@@ -1,6 +1,5 @@
-import './components/index.js';
-import ComponentHandler from './ComponentHandler.js';
-import { $element, $setAttributes } from './helpers/index.js';
+import ComponentHandler from './abstract/index.js';
+import { $element, $setAttributes } from '../helpers/index.js';
 
 const template = /*html*/ `
 <fragment>

@@ -1,12 +1,3 @@
-export const CONTROLL_KEY = {
-  CAR_NAMES: 'car-names',
-  CAR_NAMES_AFTER: 'car-names-after',
-  TRY_COUNT_AFTER: 'try-count',
-  GAME_BEFORE: 'game-before',
-  GAME: 'game',
-  RESULT: 'result',
-};
-
 export const MAX_NAME_DIGITS = 5;
 export const MAX_GAME_TRY_COUNT = 100;
 

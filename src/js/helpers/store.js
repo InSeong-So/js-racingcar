@@ -5,7 +5,7 @@ const initState = {
   maxMoveCount: 0,
 };
 
-const useStore = () => {
+export const useStore = () => {
   let localState = { ...initState };
 
   const initStore = () => {
@@ -31,5 +31,3 @@ const useStore = () => {
     getState,
   };
 };
-
-export default useStore;

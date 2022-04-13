@@ -1,7 +1,6 @@
-import ComponentHandler from '../ComponentHandler.js';
-import { CONTROLL_KEY } from '../constants.js';
-import { pipeline } from '../factory/index.js';
-import { $element } from '../helpers/index.js';
+import ComponentHandler from './abstract/index.js';
+import { racingWrapper } from '../services.js';
+import * as Helpers from '../helpers/index.js';
 
 const template = /*html*/ `
 <section class="d-flex justify-center mt-5 hidden"></section>`;
@@ -27,14 +26,25 @@ export default class GameSection extends ComponentHandler {
 
   constructor() {
     super();
-    this.insertAdjacentElement('afterbegin', $element(template));
+    this.insertAdjacentElement('afterbegin', Helpers.$element(template));
   }
 
   start() {
     const tryCount = this.getAttribute('try-count');
     const cars = this.#cars;
 
-    pipeline(CONTROLL_KEY.GAME, { tryCount, cars });
+    // prettier-ignore
+    this.process(
+      Helpers.pipe(
+        racingWrapper,
+        window.requestAnimationFrame
+      ),
+      {
+        store: this.store,
+        cars,
+        tryCount,
+      },
+    );
   }
 
   static get observedAttributes() {
@@ -44,10 +54,17 @@ export default class GameSection extends ComponentHandler {
   attributeChangedCallback(name, oldValue, newValue) {
     if (!newValue) return this.firstElementChild.classList.add('hidden');
 
-    this.#cars = pipeline(CONTROLL_KEY.GAME_BEFORE, this.getAttribute('car-names'));
+    // prettier-ignore
+    this.#cars = this.process(
+      Helpers.pipe(
+        Helpers.split,
+        carNames => carNames.map(carName => ({ name: carName, moveCount: 0 }))
+      ),
+      this.getAttribute('car-names'),
+    );
 
     this.firstElementChild.classList.remove('hidden');
-    this.firstElementChild.insertAdjacentElement('afterbegin', $element(panel(this.#cars)));
+    this.firstElementChild.insertAdjacentElement('afterbegin', Helpers.$element(panel(this.#cars)));
 
     this.start();
   }
